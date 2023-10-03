@@ -1,0 +1,17 @@
+name: test_env_xwavelet
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - xarray
+  - dask
+  - numpy
+  - numpy_groupies
+  - pytest
+  - pytest-cov
+  - pip
+  - cftime
+  - xrft
+  - pip:
+    - codecov
+    - pytest-xdist
