@@ -225,4 +225,4 @@ def power_spectrum(
     ps = ps.swap_dims(swap_dims).assign_coords(newcoords)
     ps = ps.drop([d for d in dim if d in ps.coords])
 
-    return ps[::2]
+    return ps[::2] * 2
