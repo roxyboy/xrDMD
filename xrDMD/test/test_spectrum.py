@@ -44,3 +44,6 @@ def test_spectral_amplitude(sample_da_1d):
     ps = ps * (2.0 / N / np.diff(sample_da_1d.time)[0])
 
     npt.assert_allclose(np.array([15, 10]), np.sort(ps)[::-1][:2], atol=0.5)
+    npt.assert_array_almost_equal(
+        np.array([5, 3]), np.abs(ps.freq_time.imag)[ps.values.argsort()[-2:]]
+    )

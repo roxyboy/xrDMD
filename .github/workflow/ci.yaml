@@ -2,12 +2,16 @@ name: CI
 on:
   push:
     branches:
-      - "master"
+      - "main"
   pull_request:
     branches:
       - "*"
   schedule:
     - cron: "0 13 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -30,7 +34,7 @@ jobs:
           key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('ci/environment.yml') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          activate-environment: test_env_xwavelet # Defined in ci/environment.yml
+          activate-environment: test_env_xrDMD # Defined in ci/environment.yml
           auto-update-conda: false
           python-version: ${{ matrix.python-version }}
           environment-file: ci/environment.yml
@@ -48,9 +52,9 @@ jobs:
         # run: | 
           # curl -Os https://uploader.codecov.io/latest/linux/codecov
           # chmod +x codecov
-          # CODECOV_TOKEN=5f3bd8c1-3b5b-47d5-ad0f-1e0ec7db47a4
+          # CODECOV_TOKEN=99548374-678b-477d-ae28-e1859951d99b
           # ./codecov -t ${CODECOV_TOKEN}
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
           flags: unittests
