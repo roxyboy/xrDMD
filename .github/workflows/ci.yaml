@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - "main"
+      - "master"
   pull_request:
     branches:
       - "*"
@@ -19,9 +19,9 @@ jobs:
         os: ["ubuntu-latest"]
         python-version: ["3.9", "3.10", "3.11"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Cache conda
-        uses: actions/setup-python@v3
+        uses: actions/cache@v2
         env:
           # Increase this value to reset cache if ci/environment.yml has not changed
           CACHE_NUMBER: 0
@@ -50,9 +50,7 @@ jobs:
           # chmod +x codecov
           # CODECOV_TOKEN=5f3bd8c1-3b5b-47d5-ad0f-1e0ec7db47a4
           # ./codecov -t ${CODECOV_TOKEN}
-        uses: codecov/codecov-action@v3
-	env:
-    	  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        uses: codecov/codecov-action@v1
         with:
           file: ./coverage.xml
           flags: unittests
