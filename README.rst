@@ -19,8 +19,8 @@ Get in touch
 
 .. |DOI| image:: https://zenodo.org/badge/699998240.svg
    :target: https://zenodo.org/badge/latestdoi/699998240
-.. |codecov| image:: 
-   :target: 
+.. |codecov| image:: https://codecov.io/gh/roxyboy/xrDMD/graph/badge.svg?token=keotGVEaVy 
+   :target: https://codecov.io/gh/roxyboy/xrDMD
    :alt: code coverage
 .. |Code style| image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/python/black
