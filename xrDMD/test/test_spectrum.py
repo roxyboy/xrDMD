@@ -39,6 +39,7 @@ def test_spectral_amplitude(sample_da_1d):
         rank=100,
     )
 
+    ps *= 0.5
     ps /= xrft.power_spectrum(sample_da_1d).freq_time.spacing
     ps = np.sqrt(ps)
     ps = ps * (2.0 / N / np.diff(sample_da_1d.time)[0])
