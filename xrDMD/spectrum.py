@@ -100,6 +100,7 @@ def power_spectrum(
     dim=None,
     method=None,
     delay=0.0,
+    eta=1.0,
     rank=None,
     scaling="density",
     prefix="freq_",
@@ -122,6 +123,8 @@ def power_spectrum(
         Method of DMD.
     delay : int or float
         Number of indices to construct time-delayed coordinates.
+    eta : float
+        A priori uncertainty in the data. It is ignored when `rank` is prescribed.
     rank : int
         Rank to truncate SVD.
     scaling : str, optional
@@ -222,4 +225,4 @@ def power_spectrum(
     ps = ps.swap_dims(swap_dims).assign_coords(newcoords)
     ps = ps.drop([d for d in dim if d in ps.coords])
 
-    return ps
+    return ps[::2]
