@@ -48,9 +48,9 @@ jobs:
         # run: | 
           # curl -Os https://uploader.codecov.io/latest/linux/codecov
           # chmod +x codecov
-          # CODECOV_TOKEN=5f3bd8c1-3b5b-47d5-ad0f-1e0ec7db47a4
+          # CODECOV_TOKEN=99548374-678b-477d-ae28-e1859951d99b
           # ./codecov -t ${CODECOV_TOKEN}
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
           flags: unittests
