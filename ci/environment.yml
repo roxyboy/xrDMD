@@ -1,4 +1,4 @@
-name: test_env_xwavelet
+name: test_env_xrDMD
 channels:
   - conda-forge
   - defaults
