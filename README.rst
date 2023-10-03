@@ -17,8 +17,8 @@ Get in touch
 .. _on GitHub: https://github.com/roxyboy/xrDMD/issues
 
 
-.. |DOI| image:: 
-   :target: 
+.. |DOI| image:: https://zenodo.org/badge/699998240.svg
+   :target: https://zenodo.org/badge/latestdoi/699998240
 .. |codecov| image:: 
    :target: 
    :alt: code coverage
