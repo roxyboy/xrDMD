@@ -18,20 +18,20 @@ __all__ = [
 
 def Amatrix(da, dim, rank=None, method=None, compute_u=False):
     """
-        Perform SVD decomposition to obtain A.
+    Perform SVD decomposition to obtain A.
 
-        Parameters
+    Parameters
     ----------
-    X : ndarray
+    da : xarray.DataArray
         The data to DMD.
+    dim : str
+        Dimension over SVD is taken.
     rank : int
-        Rank to truncate SVD. Ignored if `full_rank=True`.
+        Rank to truncate SVD.
     method : str
         Method of DMD.
     compute_u : bool, optional
         Whether to compute also U in addition to S and V. Default is False.
-    full_rank : bool, optional
-        Whether to compute full-rank SVD. Default is False.
 
     Returns
     -------
@@ -77,6 +77,28 @@ def Amatrix(da, dim, rank=None, method=None, compute_u=False):
 def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
     """
     Compute the DMD modes.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        The data to DMD.
+    dim : str
+        Dimension over SVD is taken.
+    rank : int
+        Rank to truncate SVD.
+    method : str
+        Method of DMD.
+    method : str, optional
+        Method of DMD.
+
+    Returns
+    -------
+    Phi : xarray.DataArray
+        DMD modes.
+    omega : xarray.DataArray
+        DMD frequencies.
+    b: ndarray
+        DMD amplitudes.
     """
     all_dim = list(da.dims)
 
@@ -153,6 +175,24 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
     """
     Reconstruct da using DMDs.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        The data to DMD.
+    dim : str
+        Dimension over SVD is taken.
+    rank : int
+        Rank to truncate SVD.
+    method : str
+        Method of DMD.
+    method : str, optional
+        Method of DMD.
+
+    Returns
+    -------
+    da_recon : xarray.DataArray
+        DMD reconstruction of `da`.
     """
     Phi, omega, b = modes(da, dim=dim, spacing_tol=1e-3, rank=5, method=method)
 
