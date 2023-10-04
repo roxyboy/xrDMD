@@ -11,9 +11,9 @@ import pandas as pd
 import dask.array as dsar
 
 import scipy.linalg as spl
-from pandas.api.types import is_numeric_dtype, is_datetime64_any_dtype
 
-from .dmd import Amatrix as _A
+from .valid_coords import check_valid_dmd_coords as _check_valid_dmd_coords
+from .valid_coords import get_coordinate_spacing as _get_coordinate_spacing
 
 __all__ = ["power_spectrum"]
 
@@ -45,53 +45,51 @@ def _new_dims_and_coords(da, dim, wavenm, prefix):
     return new_coords, swap_dims
 
 
-def _diff_coord(coord):
-    """Returns the difference as a xarray.DataArray."""
+def _Amatrix(X, rank, method=None):
+    """
+    A matrix specific to time-delayed coordinates.
 
-    v0 = coord.values[0]
-    calendar = getattr(v0, "calendar", None)
-    if calendar:
-        import cftime
+    Parameters
+    ----------
+    X : ndarray
+        The data to DMD.
+    rank : int
+        Rank to truncate SVD.
+    method : str
+        Method of DMD.
 
-        ref_units = "seconds since 1800-01-01 00:00:00"
-        decoded_time = cftime.date2num(coord, ref_units, calendar)
-        coord = xr.DataArray(decoded_time, dims=coord.dims, coords=coord.coords)
-        return np.diff(coord)
-    elif pd.api.types.is_datetime64_dtype(v0):
-        return np.diff(coord).astype("timedelta64[s]").astype("f8")
-    else:
-        return np.diff(coord)
+    Returns
+    -------
+    S : ndarray
+        The singular values.
+    V : ndarray
+        Unitary matrix having right singular vectors as columns.
+    Atilde: ndarray
+        Low dimensional linear model with `r \times r` dimensions.
+    """
+    r = rank
 
+    U, S, Vh = spl.svd(X[..., :-1].data, full_matrices=False)
+    V = np.conj(Vh[:r].T)  # Hermitian transpose
+    Uh = np.conj(U[..., :r].T)  # Hermitian tranpose
 
-def _is_valid_dmd_coord(coord):
-    return (
-        is_numeric_dtype(coord)
-        or is_datetime64_any_dtype(coord)
-        or bool(getattr(coord[0].item(), "calendar", False))
-    )
+    Atilde = Uh @ X[..., 1:] @ V @ spl.inv(np.diag(S[:r]))
 
+    if method is not None:
+        if method == "fb":
+            Ub, Sb, Vbh = spl.svd(X[..., 1:], full_matrices=False)
+            Vb = np.conj(Vbh[:r].T)  # Hermitian transpose
+            Ubh = np.conj(Ub[..., :r].T)  # Hermitian transpose
 
-def _check_valid_dmd_coords(da, dim):
-    if not np.all([_is_valid_dmd_coord(da.coords[d]) for d in dim]):
-        raise ValueError(
-            "All transformed dimensions coordinates must be numerical or datetime."
-        )
+            b_Atilde = Ubh @ X[..., :-1] @ Vb @ spl.inv(np.diag(Sb[:r]))
 
+            Atilde = spl.sqrtm(Atilde @ spl.inv(b_Atilde))
+        else:
+            raise NotImplementedError(
+                "Only forward-backward method is implemented for now."
+            )
 
-def _get_coordinate_spacing(coord, spacing_tol):
-    diff = _diff_coord(coord)
-    delta = np.abs(diff[0])
-    if not np.allclose(diff, diff[0], rtol=spacing_tol):
-        raise ValueError(
-            "Can't take Fourier transform because "
-            "coodinate %s is not evenly spaced" % coord.name
-        )
-    if delta == 0.0:
-        raise ValueError(
-            "Can't take Fourier transform because spacing in coordinate %s is zero"
-            % coord.name
-        )
-    return delta
+    return S[:r], V, Atilde
 
 
 def power_spectrum(
@@ -190,7 +188,7 @@ def power_spectrum(
     else:
         r = int(rank)
 
-    S, V, Atilde = _A(X, r, method=method)
+    S, V, Atilde = _Amatrix(X, r, method=method)
     lamb, W = spl.eig(Atilde)
 
     fbDMDfreqs = [(np.log(lamb) / (2 * np.pi * np.prod(delta_t)))]
