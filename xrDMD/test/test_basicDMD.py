@@ -11,7 +11,7 @@ import numpy.testing as npt
 import xarray.testing as xrt
 
 import xrft
-from xrDMD.DMDbase import (
+from xrDMD.basicDMD import (
     reconstruct,
 )
 

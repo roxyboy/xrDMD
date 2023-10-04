@@ -103,9 +103,9 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 
     U, S, V, _ = Amatrix(da_stacked, dim, rank=rank, compute_u=True, method=None)
     if rank is None:
-        r = len(S)[0]
+        r = len(S)
     else:
-        r = np.min(np.array([len(S)[0], rank]))
+        r = np.min(np.array([len(S), rank]))
     U = U[..., :r]
     S = S[:r]
     V = V[..., :r]
@@ -116,10 +116,10 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 
     Phi = Xp.data @ V @ spl.inv(np.diag(S)) @ W  # DMD modes
 
-    omega = np.log(lamb) / delta_t
+    omega = np.log(lamb) / delta_t  # DMD frequencies
 
     x0 = X.isel({dim[0]: 0}).data
-    b = spl.pinv(Phi) @ x0
+    b = spl.pinv(Phi) @ x0  # DMD amplitudes
 
     new_dims = ["mode"] + not_dim
     new_coords = dict()
