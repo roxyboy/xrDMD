@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode='basic'):
+def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode="basic"):
     """
     Reconstruct da using DMDs.
 
@@ -36,15 +36,15 @@ def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode='ba
     da_recon : xarray.DataArray
         DMD reconstruction of `da`.
     """
-    if mode == 'basic':
+    if mode == "basic":
         from .basicDMD import modes
-    elif mode == 'mr':
+    elif mode == "mr":
         from .mrDMD import modes
     else:
         raise NotImplementedError(
-        "Only basic and multi-resolution DMD are implemented."
+            "Only basic and multi-resolution DMD are implemented."
         )
-        
+
     Phi, omega, b = modes(da, dim=dim, spacing_tol=1e-3, rank=5, method=method)
 
     time_dynamics = b * np.exp(omega * da.time)
