@@ -21,7 +21,7 @@ def svht(X, sv=None):
     m, n = sorted(X.shape)  # ensures m <= n
     beta = m / n  # ratio between 0 and 1
     if sv is None:
-        _, sv, _ = spl.svd(X)
+        sv = spl.svd(X, compute_uv=False)
     sv = np.squeeze(sv)
     omega_approx = 0.56 * beta**3 - 0.95 * beta**2 + 1.82 * beta + 1.43
     tau = np.median(sv) * omega_approx
