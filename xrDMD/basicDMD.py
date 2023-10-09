@@ -10,10 +10,23 @@ from .valid_coords import check_valid_dmd_coords as _check_valid_dmd_coords
 from .valid_coords import get_coordinate_spacing as _get_coordinate_spacing
 
 __all__ = [
+    "svht",
     "Amatrix",
     "modes",
-    "reconstruct",
 ]
+
+
+def svht(X, sv=None):
+    # Singular Value Hard Threshold for sigma unknown
+    m, n = sorted(X.shape)  # ensures m <= n
+    beta = m / n  # ratio between 0 and 1
+    if sv is None:
+        _, sv, _ = spl.svd(X)
+    sv = np.squeeze(sv)
+    omega_approx = 0.56 * beta**3 - 0.95 * beta**2 + 1.82 * beta + 1.43
+    tau = np.median(sv) * omega_approx
+
+    return int(np.sum(sv > tau))
 
 
 def Amatrix(da, dim, rank=None, method=None, compute_u=False):
@@ -42,7 +55,10 @@ def Amatrix(da, dim, rank=None, method=None, compute_u=False):
     Atilde: ndarray
         Low dimensional linear model with `r \times r` dimensions.
     """
-    r = rank
+    if rank == None:
+        r = svht(X)
+    else:
+        r = int(rank)
     X = da.isel({dim[0]: slice(None, -1)})
     Xp = da.isel({dim[0]: slice(1, None)})
     U, S, Vh = spl.svd(X.data, full_matrices=False)
@@ -123,16 +139,11 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
     X = da_stacked.isel({dim[0]: slice(None, -1)})
     Xp = da_stacked.isel({dim[0]: slice(1, None)})
 
-    U, S, V, _ = Amatrix(da_stacked, dim, rank=rank, compute_u=True, method=None)
-    if rank is None:
-        r = len(S)
+    if rank == None:
+        r = svht(X)
     else:
-        r = np.min(np.array([len(S), rank]))
-    U = U[..., :r]
-    S = S[:r]
-    V = V[..., :r]
-
-    Atilde = np.conj(U.T) @ Xp.data @ V @ spl.inv(np.diag(S))
+        r = rank
+    S, V, Atilde = Amatrix(da_stacked, dim, rank=r, method=None)
 
     lamb, W = spl.eig(Atilde)
 
@@ -170,36 +181,3 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
         xr.DataArray(omega, coords=[("mode", new_coords["mode"])]),
         xr.DataArray(b, coords=[("mode", new_coords["mode"])]),
     )
-
-
-def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
-    """
-    Reconstruct da using DMDs.
-
-    Parameters
-    ----------
-    da : xarray.DataArray
-        The data to DMD.
-    dim : str
-        Dimension over SVD is taken.
-    rank : int
-        Rank to truncate SVD.
-    method : str
-        Method of DMD.
-    method : str, optional
-        Method of DMD.
-
-    Returns
-    -------
-    da_recon : xarray.DataArray
-        DMD reconstruction of `da`.
-    """
-    Phi, omega, b = modes(da, dim=dim, spacing_tol=1e-3, rank=5, method=method)
-
-    time_dynamics = b * np.exp(omega * da.time)
-
-    da_recon = Phi.data.T @ time_dynamics.data
-
-    da_recon = xr.DataArray(da_recon.T, dims=da.dims, coords=da.coords)
-
-    return da_recon

@@ -12,6 +12,7 @@ import dask.array as dsar
 
 import scipy.linalg as spl
 
+from .basicDMD import svht
 from .valid_coords import check_valid_dmd_coords as _check_valid_dmd_coords
 from .valid_coords import get_coordinate_spacing as _get_coordinate_spacing
 
@@ -98,7 +99,7 @@ def power_spectrum(
     dim=None,
     method=None,
     delay=0.0,
-    eta=1.0,
+    eta=0.0,
     rank=None,
     scaling="density",
     prefix="freq_",
@@ -175,16 +176,17 @@ def power_spectrum(
     N = X.shape
 
     if rank is None:
-        if len(N) == 2:
-            beta = N[1] / N[0]
+        if eta != 0.0:
+            m, n = sorted(X.shape)  # ensures m <= n
+            beta = m / n  # ratio between 0 and 1
             lambd = np.sqrt(
                 2 * (beta + 1)
                 + (8 * beta / ((beta + 1) + np.sqrt(beta**2 + 14 * beta + 1)))
             )
-            tau = lambd * np.sqrt(N[0]) * eta
+            tau = lambd * np.sqrt(n) * eta
             r = int(np.ceil(tau))
         else:
-            r = int(np.max(M))
+            r = svht(X)
     else:
         r = int(rank)
 

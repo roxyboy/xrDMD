@@ -11,7 +11,7 @@ import numpy.testing as npt
 import xarray.testing as xrt
 
 import xrft
-from xrDMD.basicDMD import (
+from xrDMD.reconstruct import (
     reconstruct,
 )
 
@@ -31,7 +31,7 @@ def sample_da_2d():
     return f1, f2
 
 
-def test_spectral_amplitude(sample_da_2d):
+def test_reconstruction(sample_da_2d):
     X = sample_da_2d[0] + sample_da_2d[1]
 
     X_recon = reconstruct(
