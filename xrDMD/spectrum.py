@@ -39,7 +39,7 @@ def _new_dims_and_coords(da, dim, wavenm, prefix):
         k = wavenm[d]
         new_name = prefix + d if d[: len(prefix)] != prefix else d[len(prefix) :]
         new_dim = xr.DataArray(k, dims=new_name, coords={new_name: k}, name=new_name)
-        new_dim.attrs.update({"spacing": k[1] - k[0]})
+        #         new_dim.attrs.update({"spacing": k[1] - k[0]})
         new_coords[new_name] = new_dim
         swap_dims[d] = new_name
 
