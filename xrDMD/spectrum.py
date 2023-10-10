@@ -72,9 +72,10 @@ def _Amatrix(X, rank, method=None):
 
     U, S, Vh = spl.svd(X[..., :-1].data, full_matrices=False)
     V = np.conj(Vh[:r].T)  # Hermitian transpose
-    Uh = np.conj(U[..., :r].T)  # Hermitian tranpose
+    Uh = np.conj(U[..., :r].T)  # Hermitian transpose
+    S = S[:r]
 
-    Atilde = Uh @ X[..., 1:] @ V @ spl.inv(np.diag(S[:r]))
+    Atilde = Uh @ X[..., 1:] @ V @ spl.inv(np.diag(S))
 
     if method is not None:
         if method == "fb":
@@ -90,7 +91,7 @@ def _Amatrix(X, rank, method=None):
                 "Only forward-backward method is implemented for now."
             )
 
-    return S[:r], V, Atilde
+    return S, V, Atilde
 
 
 def power_spectrum(
@@ -187,6 +188,8 @@ def power_spectrum(
             r = int(np.ceil(tau))
         else:
             r = svht(X)
+        if r == 0:
+            r = min(N)
     else:
         r = int(rank)
 
