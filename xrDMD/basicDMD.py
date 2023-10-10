@@ -141,6 +141,8 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 
     if rank == None:
         r = svht(X)
+        if r == 0:
+            r = min(X.shape)
     else:
         r = rank
     S, V, Atilde = Amatrix(da_stacked, dim, rank=r, method=None)
