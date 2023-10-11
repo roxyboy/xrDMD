@@ -145,7 +145,7 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
             r = min(X.shape)
     else:
         r = rank
-    S, V, Atilde = Amatrix(da_stacked, dim, rank=r, method=None)
+    S, V, Atilde = Amatrix(da_stacked, dim, rank=r, method=method)
 
     lamb, W = spl.eig(Atilde)
 

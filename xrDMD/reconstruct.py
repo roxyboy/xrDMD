@@ -45,7 +45,7 @@ def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode="ba
             "Only basic and multi-resolution DMD are implemented."
         )
 
-    Phi, omega, b = modes(da, dim=dim, spacing_tol=1e-3, rank=5, method=method)
+    Phi, omega, b = modes(da, dim=dim, spacing_tol=1e-3, rank=rank, method=method)
 
     time_dynamics = b * np.exp(omega * da.time)
 
