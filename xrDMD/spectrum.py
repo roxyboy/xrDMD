@@ -196,7 +196,7 @@ def power_spectrum(
     S, V, Atilde = _Amatrix(X, r, method=method)
     lamb, W = spl.eig(Atilde)
 
-    fbDMDfreqs = [(np.log(lamb) / (2 * np.pi * np.prod(delta_t)))]
+    fbDMDfreqs = [(np.log(lamb) / (2 * np.pi * dt)) for dt in delta_t]
 
     Phi = X[..., 1:] @ V @ spl.inv(np.diag(S)) @ W
     b = spl.pinv(Phi) @ X[..., 0]
