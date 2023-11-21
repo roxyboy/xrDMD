@@ -14,7 +14,9 @@ __all__ = [
 ]
 
 
-def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode="basic"):
+def reconstruct(
+    da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode="basic", sparse=False
+):
     """
     Reconstruct da using DMDs.
 
@@ -30,6 +32,8 @@ def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode="ba
         Method of DMD.
     mode : str
         Flavor of DMD.
+    sparse : boolean
+        Sparse enhanced algorithm to reconstruct.
 
     Returns
     -------
@@ -45,11 +49,32 @@ def reconstruct(da, dim=None, spacing_tol=1e-3, rank=None, method=None, mode="ba
             "Only basic and multi-resolution DMD are implemented."
         )
 
-    Phi, omega, b = modes(da, dim=dim, spacing_tol=1e-3, rank=rank, method=method)
+    all_dim = list(da.dims)
 
-    time_dynamics = b * np.exp(omega * da.time)
+    if dim is None:
+        dim = all_dim
+    else:
+        if isinstance(dim, str):
+            dim = [dim]
 
-    da_recon = Phi.data.T @ time_dynamics.data
+    axis_num = [da.get_axis_num(d) for d in dim]
+
+    Phi, lamb, b = modes(da, dim=dim, spacing_tol=1e-3, rank=rank, method=method)
+
+    if sparse:
+        M = [da.shape[n] for n in axis_num]
+        Vand = np.vander(lamb.data, int(np.prod(M)), True)
+
+        Psi = (Vand.T.data * b.data).T
+
+        da_recon = Phi.data.T @ Psi.data
+    else:
+        delta_t = [_get_coordinate_spacing(da[d], spacing_tol) for d in dim]
+        omega = np.log(lamb) / delta_t  # DMD frequencies
+
+        time_dynamics = b * np.exp(omega * da[dim[axis_num[0]]])
+
+        da_recon = Phi.data.T @ time_dynamics.data
 
     da_recon = xr.DataArray(da_recon.T, dims=da.dims, coords=da.coords)
 

@@ -153,7 +153,7 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 
     Phi = Xp.data @ V @ spl.inv(np.diag(S)) @ W  # DMD modes
 
-    omega = np.log(lamb) / delta_t  # DMD frequencies
+    # omega = np.log(lamb) / delta_t  # DMD frequencies
 
     x0 = X.isel({dim[0]: 0}).data
     b = spl.pinv(Phi) @ x0  # DMD amplitudes
@@ -182,6 +182,6 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 
     return (
         Phi,
-        xr.DataArray(omega, coords=[("mode", new_coords["mode"])]),
+        xr.DataArray(lamb, coords=[("mode", new_coords["mode"])]),
         xr.DataArray(b, coords=[("mode", new_coords["mode"])]),
     )
