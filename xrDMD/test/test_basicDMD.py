@@ -41,3 +41,11 @@ def test_reconstruction(sample_da_2d):
     )
 
     npt.assert_array_almost_equal(X, X_recon)
+
+    X_recon = reconstruct(
+        X,
+        dim="time",
+        rank=None,
+    )
+
+    npt.assert_array_almost_equal(X, X_recon)

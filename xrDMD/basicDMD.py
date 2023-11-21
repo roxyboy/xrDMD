@@ -55,13 +55,15 @@ def Amatrix(da, dim, rank=None, method=None, compute_u=False):
     Atilde: ndarray
         Low dimensional linear model with `r \times r` dimensions.
     """
+
+    X = da.isel({dim[0]: slice(None, -1)})
+    Xp = da.isel({dim[0]: slice(1, None)})
+    U, S, Vh = spl.svd(X.data, full_matrices=False)
+
     if rank == None:
         r = svht(X)
     else:
         r = int(rank)
-    X = da.isel({dim[0]: slice(None, -1)})
-    Xp = da.isel({dim[0]: slice(1, None)})
-    U, S, Vh = spl.svd(X.data, full_matrices=False)
 
     V = np.conj(Vh[:r].T)  # Hermitian transpose
     Uh = np.conj(U[..., :r].T)  # Hermitian transpose
