@@ -135,7 +135,6 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
     not_dim = [all_dim[n] for n in range(da.ndim) if n not in axis_num]
 
     M = [da.shape[n] for n in axis_num]
-    delta_t = [_get_coordinate_spacing(da[d], spacing_tol) for d in dim]
 
     da_stacked = da.stack(zeta=not_dim).transpose()
     X = da_stacked.isel({dim[0]: slice(None, -1)})
@@ -153,6 +152,7 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
 
     Phi = Xp.data @ V @ spl.inv(np.diag(S)) @ W  # DMD modes
 
+    # delta_t = [_get_coordinate_spacing(da[d], spacing_tol) for d in dim]
     # omega = np.log(lamb) / delta_t  # DMD frequencies
 
     x0 = X.isel({dim[0]: 0}).data
