@@ -63,7 +63,7 @@ def reconstruct(
 
     if sparse:
         M = [da.shape[n] for n in axis_num]
-        Vand = np.vander(lamb.data, int(np.prod(M)), True)
+        Vand = np.vander(lamb.data, int(np.prod(M)), increasing=True)
 
         Psi = (Vand.T.data * b.data).T
 
