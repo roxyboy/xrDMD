@@ -300,7 +300,7 @@ def mrdmd(
                 phi.coords["level"] = ("mode", np.ones(len(phi.mode)) * l)
                 omega.coords["level"] = ("mode", np.ones(len(omega.mode)) * l)
                 b.coords["level"] = ("mode", np.ones(len(b.mode)) * l)
-                print(phi.mode)
+                
                 Phi = xr.concat([Phi, phi], "mode")
                 Omega = xr.concat([Omega, omega], "mode")
                 B = xr.concat([B, b], "mode")
