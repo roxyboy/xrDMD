@@ -264,6 +264,8 @@ def mrdmd(
 
     Returns
     -------
+    da_recon: xarray.DataArray
+        Reconstruction of da on each level.
     Phi : xarray.DataArray
         DMD modes.
     omega : xarray.DataArray
