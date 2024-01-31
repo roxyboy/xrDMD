@@ -57,7 +57,6 @@ def _mrmodes(
     # extract subsamples
     sub_sample = bin_size // nNyquist  # max step size to capture cycles
     cutoff_freq = max_cycle / bin_size
-    print(bin_size, cutoff_freq, sub_sample)
 
     da_stacked = da.stack(zeta=not_dim).transpose()
     isub = [np.arange(0, M[n], sub_sample, dtype=int) for n in axis_num]
