@@ -40,7 +40,7 @@ def _mrmodes(
     axis_num = [da.get_axis_num(d) for d in dim]
     not_dim = [all_dim[n] for n in range(da.ndim) if n not in axis_num]
     M = [da.shape[n] for n in axis_num]
-    delta_t = [_get_coordinate_spacing(da[d], spacing_tol) for d in dim]
+    # delta_t = [_get_coordinate_spacing(da[d], spacing_tol) for d in dim]
 
     # T = np.array(M) * np.array(delta_t)
     # cutoff_freq = max_cycle / np.prod(T)
