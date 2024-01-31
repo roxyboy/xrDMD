@@ -240,7 +240,41 @@ def mrdmd(
 ):
     """
     Applying DMD recursively.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+        The data to DMD.
+    dim : str
+        Dimension over SVD is taken.
+    rank : int, optional
+        Rank to truncate SVD.
+    method : str, optional
+        Method of DMD.
+    delay : int
+        Number of data points to stagger to capture autocorrelated features.
+    max_cycle: int
+        Maximum number of mode oscillations in any given time scale that qualify as "slow".
+    nNyquist: float
+        Non-dimensional Nyquist limit to capture cycles. Should be a product of `max_cycle`.
+    max_level: int
+        Maximum number of levels.
+    sparse: bool, optional
+        Whether to use sparse-enhanced DMD.
+
+    Returns
+    -------
+    Phi : xarray.DataArray
+        DMD modes.
+    omega : xarray.DataArray
+        DMD frequencies.
+    b: ndarray
+        DMD amplitudes.
     """
+
+    if nNyquist % max_cycle != 0.0:
+        raise ValueError("`nNyquist` should be a product of `max_cycle`.")
+
     all_dim = list(da.dims)
 
     if dim is None:
@@ -258,6 +292,7 @@ def mrdmd(
             Phi, Omega, B = _mrmodes(
                 da,
                 dim=dim,
+                spacing_tol=spacing_tol,
                 rank=rank,
                 method=method,
                 max_cycle=max_cycle,
@@ -270,8 +305,10 @@ def mrdmd(
             da_recon = _mrreconstruct(
                 da,
                 dim=dim,
+                spacing_tol=spacing_tol,
                 rank=rank,
                 method=method,
+                delay=delay,
                 max_cycle=max_cycle,
                 nNyquist=nNyquist,
                 sparse=sparse,
@@ -292,6 +329,7 @@ def mrdmd(
                     dim=dim,
                     rank=rank,
                     method=method,
+                    delay=delay,
                     max_cycle=max_cycle,
                     nNyquist=nNyquist,
                     sparse=sparse,
@@ -308,8 +346,10 @@ def mrdmd(
                 recon_tmp = _mrreconstruct(
                     da_seg,
                     dim=dim,
+                    spacing_tol=spacing_tol,
                     rank=rank,
                     method=method,
+                    delay=delay,
                     max_cycle=max_cycle,
                     nNyquist=nNyquist,
                     sparse=sparse,

@@ -49,6 +49,14 @@ def sample_data():
 
 
 def test_mrdmd(sample_data):
+    with pytest.raises(ValueError):
+        mrdmd(
+            sample_data,
+            dim="time",
+            max_cycle=2,
+            nNyquist=5.0,
+        )
+
     reX, _, _, _ = mrdmd(
         sample_data,
         dim="time",
