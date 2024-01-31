@@ -104,8 +104,6 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
         Dimension over SVD is taken.
     rank : int
         Rank to truncate SVD.
-    method : str
-        Method of DMD.
     method : str, optional
         Method of DMD.
 
