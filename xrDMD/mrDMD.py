@@ -64,7 +64,9 @@ def _mrmodes(
 
     Xsub = da_stacked.isel(isub)  # subsampled
     # Xsub = da_stacked  # not subsampled
-    X = Xsub.isel({dim[0]: slice(None, -int(delay + 1))})
+    X = Xsub.isel(
+        {dim[0]: slice(None, -int(delay + 1))}
+    )  # As a default, X should only go up to before the last element.
     Xstacked = X.copy()
     if delay > 0:  # time-delayed coordinates
         for tt in range(int(delay)):
@@ -94,6 +96,8 @@ def _mrmodes(
                     ],
                     "zeta",
                 )
+    elif delay < 0:
+        raise ValueError("`delay` should be a non-negative integer.")
     # if delay > 0:
     #     for tt in range(int(delay)):
     #         if tt < delay:
@@ -116,7 +120,7 @@ def _mrmodes(
             Xsub,
         )
     else:
-        r = rank
+        r = int(rank)
     S, V, Atilde = Amatrix(Xstacked, dim, rank=r, method=method)
     Vh = np.conj(V.T)
 
@@ -248,7 +252,8 @@ def mrdmd(
     dim : str
         Dimension over SVD is taken.
     rank : int, optional
-        Rank to truncate SVD.
+        Rank to truncate SVD. If -1, the full-rank SVD will be computed.
+        If None, it will be determined via the optimal Singular Value Hard Threshold.
     method : str, optional
         Method of DMD.
     delay : int

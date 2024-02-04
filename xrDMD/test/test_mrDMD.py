@@ -72,3 +72,19 @@ def test_mrdmd(sample_data):
         np.ones((2, 2)) * 0.99,
         atol=0.01,
     )
+
+    reX, _, _, _ = mrdmd(
+        sample_data,
+        dim="time",
+        rank=-1,
+        delay=1,
+        max_cycle=2,
+        nNyquist=16.0,
+        max_level=7,
+    )
+
+    npt.assert_allclose(
+        np.corrcoef(sample_data.real.data.ravel(), reX.sum("level").real.data.ravel()),
+        np.ones((2, 2)) * 0.99,
+        atol=0.01,
+    )
