@@ -40,7 +40,8 @@ def Amatrix(da, dim, rank=None, method=None, compute_u=False):
     dim : str
         Dimension over SVD is taken.
     rank : int
-        Rank to truncate SVD.
+        Rank to truncate SVD. If -1, the full-rank SVD will be computed.
+        If None, it will be determined via the optimal Singular Value Hard Threshold.
     method : str
         Method of DMD.
     compute_u : bool, optional
@@ -63,7 +64,10 @@ def Amatrix(da, dim, rank=None, method=None, compute_u=False):
     if rank == None:
         r = svht(X)
     else:
-        r = int(rank)
+        if rank == -1:
+            r = None
+        else:
+            r = int(rank)
 
     V = np.conj(Vh[:r].T)  # Hermitian transpose
     Uh = np.conj(U[..., :r].T)  # Hermitian transpose
@@ -138,13 +142,16 @@ def modes(da, dim=None, spacing_tol=1e-3, rank=None, method=None):
     X = da_stacked.isel({dim[0]: slice(None, -1)})
     Xp = da_stacked.isel({dim[0]: slice(1, None)})
 
-    if rank == None:
-        r = svht(X)
-        if r == 0:
-            r = min(X.shape)
-    else:
-        r = rank
-    S, V, Atilde = Amatrix(da_stacked, dim, rank=r, method=method)
+    # if rank == None:
+    #     r = svht(X)
+    #     if r == 0:
+    #         r = min(X.shape)
+    # else:
+    #     if rank == -1:
+    #         r = int(np.prod(M))
+    #     else:
+    #         r = int(rank)
+    S, V, Atilde = Amatrix(da_stacked, dim, rank=rank, method=method)
 
     lamb, W = spl.eig(Atilde)
 
