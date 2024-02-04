@@ -48,3 +48,20 @@ def test_spectral_amplitude(sample_da_1d):
     npt.assert_array_almost_equal(
         np.array([5, 3]), np.abs(ps.freq_time.imag)[ps.values.argsort()[-2:]]
     )
+
+    ps = power_spectrum(
+        sample_da_1d,
+        dim="time",
+        delay=200,
+        rank=-1,
+    )
+
+    ps *= 0.5
+    ps /= xrft.power_spectrum(sample_da_1d).freq_time.spacing
+    ps = np.sqrt(ps)
+    ps = ps * (2.0 / N / np.diff(sample_da_1d.time)[0])
+
+    npt.assert_allclose(np.array([15, 10]), np.sort(ps)[::-1][:2], atol=0.5)
+    npt.assert_array_almost_equal(
+        np.array([5, 3]), np.abs(ps.freq_time.imag)[ps.values.argsort()[-2:]]
+    )
