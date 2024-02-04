@@ -126,7 +126,8 @@ def power_spectrum(
     eta : float
         A priori uncertainty in the data. It is ignored when `rank` is prescribed.
     rank : int
-        Rank to truncate SVD.
+        Rank to truncate SVD. If -1, the full-rank SVD will be computed.
+        If None, it will be determined via the optimal Singular Value Hard Threshold.
     scaling : str, optional
         If 'density', it will normalize the output to power spectral density.
         If 'spectrum', it will normalize the output to power spectrum.
@@ -191,7 +192,10 @@ def power_spectrum(
         if r == 0:
             r = min(N)
     else:
-        r = int(rank)
+        if rank == -1:
+            r = None
+        else:
+            r = int(rank)
 
     S, V, Atilde = _Amatrix(X, r, method=method)
     lamb, W = spl.eig(Atilde)
